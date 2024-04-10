@@ -102,6 +102,27 @@
   
 `$ git push —set-upstream origin setting/#1`
 
+------
+
+### 작업한 브랜치 로컬에서 삭제
+
+- 브랜치 위치 확인
+
+`$ git branch`
+
+</br>
+
+- 작업 브랜치라면 브랜치 변경(develop 브랜치면 그냥 두기)
+
+`$ git switch develop`
+
+</br>
+
+- 작업 브랜치 로컬에서 삭제
+- $ git branch -D [작업한브랜치]
+  
+`$ git branch -D setting/#1`
+
 
 
 
