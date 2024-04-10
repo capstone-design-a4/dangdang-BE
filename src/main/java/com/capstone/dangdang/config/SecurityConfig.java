@@ -1,6 +1,6 @@
 package com.capstone.dangdang.config;
 
-import com.capstone.dangdang.entity.UserRole;
+import com.capstone.dangdang.enums.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -26,16 +26,24 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "/join", "login", "/loginForm", "/joinForm").permitAll()
-                        .requestMatchers("/user/**").hasRole(UserRole.USER.name())
-                        .requestMatchers("/admin/**").hasRole(UserRole.ADMIN.name())
+                        .requestMatchers("/dangdang", "/dangdang/join", "/dangdang/login").permitAll()
+                        .requestMatchers("/dangdang/info/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
+                        .requestMatchers("/dangdang/admin/**").hasRole(Role.ADMIN.name())
                         .anyRequest().authenticated()
                 );
 
         http
-                .formLogin((auth) -> auth.loginPage("/loginForm")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/")
+                .formLogin((auth) -> auth.loginPage("/dangdang/login")
+                        .loginProcessingUrl("/dangdang/login")
+                        .defaultSuccessUrl("/dangdang")
+                        .failureUrl("/dangdang/login")
+                        .usernameParameter("loginId")
+                        .passwordParameter("password")
+                );
+
+        http
+                .logout((auth) -> auth
+                        .logoutUrl("/dangdang/logout")
                 );
 
         return http.build();
