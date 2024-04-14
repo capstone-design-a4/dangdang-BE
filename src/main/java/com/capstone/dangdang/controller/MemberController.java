@@ -6,107 +6,63 @@ import com.capstone.dangdang.entity.MemberEntity;
 import com.capstone.dangdang.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.core.Authentication;
 import jakarta.validation.Valid;
 
-@Controller
+@RestController
 @RequestMapping("/dangdang")
 @RequiredArgsConstructor
 public class MemberController {
 
-    @Autowired
     private final MemberService memberService;
 
     @GetMapping(value = {"", "/"})
-    public String home(Model model, Authentication auth){
-        model.addAttribute("pageName", "홈 화면");
-        model.addAttribute("homePageName", "dangdang");
-
+    public ResponseEntity<String> home(Authentication auth){
         if (auth != null){
             MemberEntity loginMember = memberService.getLoginMemberByLoginId(auth.getName());
             if (loginMember != null){
-                model.addAttribute("name", loginMember.getName());
+                return ResponseEntity.ok("Welcome, " + loginMember.getName() + "!");
             }
         }
-
-        return "home";
-    }
-
-    @GetMapping("/join")
-    public String joinPage(Model model) {
-
-        model.addAttribute("homePageName", "dangdang");
-        model.addAttribute("pageName", "회원가입 화면");
-
-        // 회원가입을 위해서 model 통해서 joinRequest 전달
-        model.addAttribute("joinRequest", new JoinRequest());
-        return "join";
+        return ResponseEntity.ok("Welcome!");
     }
 
     @PostMapping("/join")
-    public String join(@Valid @ModelAttribute JoinRequest joinRequest,
-                       BindingResult bindingResult, Model model) {
-
-        model.addAttribute("homePageName", "dangdang");
-        model.addAttribute("pageName", "회원가입 화면");
-
-        // ID 중복 여부 확인
+    public ResponseEntity<String> join(@Valid @RequestBody JoinRequest joinRequest, BindingResult bindingResult) {
         if (memberService.checkLoginIdDuplicate(joinRequest.getLoginId())) {
             bindingResult.addError(new FieldError("joinRequest", "loginId", "ID가 존재합니다."));
         }
-
-        // 비밀번호 = 비밀번호 체크 여부 확인
         if (!joinRequest.getPassword().equals(joinRequest.getPasswordCheck())) {
             bindingResult.addError(new FieldError("joinRequest", "passwordCheck", "비밀번호가 일치하지 않습니다."));
         }
-
-        // 에러가 존재할 시 다시 join.html로 전송
         if (bindingResult.hasErrors()) {
-            return "join";
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors().toString());
         }
-
-        // 에러가 존재하지 않을 시 joinRequest 통해서 회원가입 완료
         memberService.securityJoin(joinRequest);
-
-        // 회원가입 시 홈 화면으로 이동
-        return "redirect:/dangdang";
+        return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
 
     @GetMapping("/login")
-    public String loginPage(Model model) {
-
-        model.addAttribute("homePageName", "dangdang");
-        model.addAttribute("pageName", "로그인 화면");
-
-        model.addAttribute("loginRequest", new LoginRequest());
-        return "login";
+    public ResponseEntity<String> loginPage() {
+        return ResponseEntity.ok("로그인 화면");
     }
 
     @GetMapping("/info")
-    public String memberInfo(Authentication auth, Model model) {
-        model.addAttribute("homePageName", "dangdang");
-        model.addAttribute("pageName", "마이페이지 화면");
-
+    public ResponseEntity<String> memberInfo(Authentication auth) {
         MemberEntity loginMember = memberService.getLoginMemberByLoginId(auth.getName());
-
         if(loginMember == null) {
-            return "redirect:/dangdang/login";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 후 이용해주세요.");
         }
-
-        model.addAttribute("member", loginMember);
-        return "info";
+        return ResponseEntity.ok(loginMember.toString());
     }
+
     @GetMapping("/admin")
-    public String adminPage(Model model) {
-
-        model.addAttribute("homePageName", "dangdang");
-        model.addAttribute("pageName", "관리자페이지 화면");
-
-        return "admin";
+    public ResponseEntity<String> adminPage() {
+        return ResponseEntity.ok("관리자페이지 화면");
     }
 }
