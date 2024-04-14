@@ -26,6 +26,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**").permitAll()
                         .requestMatchers("/dangdang", "/dangdang/join", "/dangdang/login").permitAll()
                         .requestMatchers("/dangdang/info/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
                         .requestMatchers("/dangdang/admin/**").hasRole(Role.ADMIN.name())
@@ -44,6 +45,7 @@ public class SecurityConfig {
         http
                 .logout((auth) -> auth
                         .logoutUrl("/dangdang/logout")
+
                 );
 
         return http.build();
