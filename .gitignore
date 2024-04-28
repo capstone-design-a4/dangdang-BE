@@ -38,4 +38,3 @@ out/
 
 # Ignore application-aws.yml file
 application-aws.yml
-application.yml
