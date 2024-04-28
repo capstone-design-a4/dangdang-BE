@@ -12,6 +12,11 @@ import java.util.List;
 
 public interface DrinkRecordRepository extends JpaRepository<DrinkRecordEntity, Long> {
 
-    @Query("SELECT d FROM DrinkRecordEntity d WHERE DATE(d.createDate) = :today AND d.member.id = :memberId")
-    List<DrinkRecordEntity> findAllByCreateDateIsTodayAndMemberId(@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate today, @Param("memberId") Long memberId);
+
+    @Query("SELECT d FROM DrinkRecordEntity d WHERE DATE(d.createDate) = :createDate AND d.member.id = :memberId")
+    List<DrinkRecordEntity> findAllByCreateDateIsTodayAndMemberId(@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Param("createDate") LocalDate createDate, @Param("memberId") Long memberId);
+
+
+
+
 }
