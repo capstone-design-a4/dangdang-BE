@@ -2,38 +2,37 @@ package com.capstone.dangdang.entity;
 
 import com.capstone.dangdang.enums.CafeName;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
+import lombok.*;
+import org.hibernate.annotations.CollectionType;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Table(name = "board")
-@Entity
-@Getter
+@Data
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
+@Builder
+@Entity
 public class BoardEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     Long id;
 
-    @Column(name = "number")
-    Integer number;
-
     @Column(name = "title")
     String title;
 
-    @Column(name = "content", columnDefinition = "TEXT")
+    @Column(name = "content", columnDefinition = "LONGTEXT")
     String content;
 
-    @Column(name = "name")
-    String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private MemberEntity member;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
@@ -42,18 +41,19 @@ public class BoardEntity {
     @Column(name = "view")
     Long view;
 
-    @Column(name = "sub")
-    Integer sub;
+    @ElementCollection
+    @Builder.Default
+    private List<Long> likeMemberIdList = new ArrayList<>();
 
-    // 댓글 수
-    @Column(name = "comment")
-    Integer comment;
-
-    @CreationTimestamp
-    @Column(name = "create_date")
-    private Timestamp createDate;
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<CommentEntity> commentList = new ArrayList<>();
 
     @LastModifiedDate
     @Column(name = "update_date")
     private Timestamp updateDate;
+
+    public void addComment(CommentEntity commentEntity) {
+        commentList.add(commentEntity);
+    }
 }

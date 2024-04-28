@@ -1,0 +1,39 @@
+server:
+  servlet:
+    cookie:
+      same-site: None
+      secure: true
+
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 10MB
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/dangdang?serverTimezone=Asia/Seoul&useLegacyDatetimeCode=false&characterEncoding=UTF-8
+    username: chan
+    password: chan1234
+    hikari:
+      max-lifetime: 177000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:db/data.sql
+    properties:
+      hibernate:
+        format_sql: true
+
+file: ./Image
+
+logging:
+  level:
+    web: debug
+
+springdoc:
+  show-login-endpoint: true

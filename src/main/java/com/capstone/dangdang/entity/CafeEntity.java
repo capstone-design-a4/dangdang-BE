@@ -2,24 +2,27 @@ package com.capstone.dangdang.entity;
 
 import com.capstone.dangdang.enums.CafeName;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "cafe")
-@Entity
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+@Data
+@Entity
 public class CafeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    Long id;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "name")
-    CafeName name;
+    private CafeName name;
 
-    @Column(name = "image_url")
-    String imageUrl;
+    @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY) @Builder.Default
+    private List<DrinkEntity> drinkList = new ArrayList<>();
 }

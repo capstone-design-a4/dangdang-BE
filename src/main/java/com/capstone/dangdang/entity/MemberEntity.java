@@ -6,9 +6,11 @@ import com.capstone.dangdang.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Table(name = "member")
 @Entity
-@Getter
+@Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -38,6 +40,9 @@ public class MemberEntity {
     @Column(name = "provider")
     Provider provider;
 
+    String phoneNumber;
+
+
     @Column(name = "social_id")
     String socialId;
 
@@ -47,4 +52,9 @@ public class MemberEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     Role role;
+
+    @OneToOne
+    RecordEntity record;
+
+    LocalDate birth;
 }
